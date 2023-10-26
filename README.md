@@ -1,1 +1,1 @@
-# grupo-planeta-r-training-part-2
+Resources for Introduction to R for statistics, part 2
