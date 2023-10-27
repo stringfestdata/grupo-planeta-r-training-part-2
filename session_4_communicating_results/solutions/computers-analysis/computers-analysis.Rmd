@@ -1,0 +1,159 @@
+---
+title: "Computers analysis"
+author: "George Mount"
+output:
+  html_notebook: default
+  html_document:
+    df_print: paged
+  pdf_document: default
+---
+
+# Does the presence of a CD-ROM affect sales price?
+
+## Introduction
+
+CD-ROMs seem to be the hot new thing, etc., etc.... 
+
+Let's call in all of our packages and get started: 
+
+<!-- echo=FALSE means just the output will show in the doc; not the source code
+  warning=FALSE means any warning messages aren't shown in the doc 
+  message=FALSE means messages won't be shown ---> 
+
+```{r warning=FALSE, message=FALSE}
+library(tidyverse)
+library(readxl)
+library(psych)
+library(broom)
+library(formattable)
+```
+
+
+## Data
+
+The source of this data is the *Journal of Applied Econometrics*. It came to us in an Excel file:
+
+<!-- This would print the entire dataset in PDF! --> 
+
+
+```{r}
+computers <- read_excel("../../datasets/computers.xlsx")
+computers
+```
+
+
+<!--- 
+
+This would be a good time to introduce the preview functionality. If they export to HTML the end user can browse through the data 
+
+Also that this can be used to add comments that won't shot up anywhere besides doc. 
+--->  
+
+```{r include = FALSE}
+nrows <- comma(nrow(computers), digits = 0)
+ncols <- ncol(computers)
+
+nrows
+ncols
+```
+
+
+<!--- Throw an error in one of these lines to show the consequences ---> 
+
+There are `r nrows` rows and `r ncols` columns in this dataset. 
+
+```{r include = FALSE}
+avg_price <- currency(mean(computers$price), digits = 0)
+avg_price
+```
+
+
+The descriptive statistics for `price` are as follows. The average price is `r avg_price`
+
+
+```{r}
+describe(computers$price)
+```
+## Hypotheses
+
+Our hypothesis: **there is no difference in sales price of computers with and without a CD-ROM**.
+
+## Methods
+
+We will conduct an independent samples t-test at the 95% confidence level. 
+
+
+
+First we'll visually inspect the distribution of price by CD to confirm the CLT is likely to apply. If that looks good, we will conduct a two-tail t-test at the 95% confidence level. 
+
+## Results
+
+### Descriptive statistics
+
+
+```{r}
+group_summary <- computers %>% 
+  group_by(cd) %>% 
+  summarise(count_records = n(), avg_price = mean(price))
+
+group_summary
+```
+
+There are `r group_summary %>% filter(cd == 'no') %>% pull(count_records)` computers without a CD and `r group_summary %>% filter(cd == 'yes') %>% pull(count_records)` with. 
+
+
+### Visualization
+
+It looks good: 
+
+
+
+```{r}
+ggplot(data = computers, aes(x = price)) +
+  geom_histogram() +
+  facet_grid(~ cd)
+```
+
+### T-test
+
+The test was significant at p < .005. With 95% confidence we expect computers with a CD-ROM to sell between `r ci_low` and `r ci_high` less. 
+
+
+
+The full results are as follows: 
+
+
+
+```{r}
+cd_test <- t.test(price ~ cd, data = computers)
+tidy_cd_test <- tidy(cd_test)
+tidy_cd_test
+```
+
+```{r include = FALSE}
+ci_low <- currency(tidy_cd_test['conf.low']) * -1
+ci_low
+ci_high <- currency(tidy_cd_test['conf.high']) * -1
+ci_high
+```
+
+
+
+
+
+## Conclusion
+
+CD-ROMs seem to be the hot new thing. Are there other things influencing it?
+
+Maybe premium computers tend to have CD Roms, and *that's* what is really affecting the price. I would want to test this. We'd also want to evaluate the overall cost/benefit of including this feature. 
+
+
+## Appendix
+
+
+- [Link to original dataset](https://rdrr.io/cran/Ecdat/man/Computers.html)
+- A computer of a CD-ROM drive :) 
+
+![CD drive](../../images/cd-drive.jpg){width=50%}
+
+<!-- Or we can use HTML!-->

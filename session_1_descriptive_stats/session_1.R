@@ -1,5 +1,6 @@
 library(tidyverse)
 library(nycflights13)
+library(ggrepel)
 
 # Tools > Global Options > 
 # Code > native pipe operator
@@ -45,6 +46,122 @@ flights |>
 flights |>
   filter(dep_time %in% c(NA, 0800))
 
-### Exercises: 
 
-### Exercise solutions: 
+# recoding values
+
+my_if_else <- c(-3:3, NA)
+
+case_when(
+  my_if_else == 0 ~ '0',
+  my_if_else < 0 ~ 'minus',
+  my_if_else > 0 ~ 'plus'
+)
+
+# NA's are treated differently 
+
+case_when(
+  my_if_else == 0 ~ '0',
+  my_if_else < 0 ~ 'minus',
+  my_if_else > 0 ~ 'plus', 
+  is.na(my_if_else) ~ '???'
+)
+
+# Recode/bin arrival delay
+
+flights |>
+  mutate(
+    status = case_when(
+      is.na(arr_delay) ~ "cancelled",
+      arr_delay < -30 ~ "very early",
+      arr_delay < -15 ~ "early",
+      abs(arr_delay) <= 15 ~ "on time",
+      arr_delay < 60 ~ "late",
+      arr_delay < Inf ~ "very late",
+    ),
+    .keep = "used"
+  )
+
+
+### Exercises: ADD LINK and add something for recoding
+
+### Exercise solutions: ADD LINK
+
+
+### Data visualization with ggplot2 ###
+
+
+ggplot(mpg, aes(x = displ, y = hwy, color = class)) +
+  geom_point()
+
+ggplot(mpg, aes(x = displ, y = hwy, shape = class)) +
+  geom_point()
+
+ggplot(mpg, aes(x = displ, y = hwy, size = class)) +
+  geom_point()
+
+ggplot(mpg, aes(x = displ, y = hwy, alpha = class)) +
+  geom_point()
+
+# Color doesn't say anything about the aesthetic mappings 
+ggplot(mpg, aes(x = displ, y = hwy)) +
+  geom_point(color = "blue")
+
+
+# Different geometry for different points
+
+ggplot(mpg, aes(x = displ, y = hwy)) +
+  geom_point() +
+  geom_point(
+    data = mpg |> filter(class == "2seater"),
+    color = "red"
+  ) +
+  geom_point(
+    data = mpg |> filter(class == "2seater"),
+    shape = "circle open", size = 3, color = "red"
+  )
+
+# Facet plots -- small multiples
+
+ggplot(mpg, aes(x = displ, y = hwy)) +
+  geom_point() +
+  facet_wrap(~cyl)
+
+
+# bivariate facet grid
+
+ggplot(mpg, aes(x = displ, y = hwy)) +
+  geom_point() +
+  facet_grid(drv ~ cyl)
+
+# Spot outliers
+
+potential_outliers <- mpg |>
+  filter(hwy > 40 | (hwy > 20 & displ > 5))
+
+# geom_text_repel() comes from ggrepel package
+# helps us highlight certain points on a plot 
+
+ggplot(mpg, aes(x = displ, y = hwy)) +
+  geom_point() +
+  geom_text_repel(data = potential_outliers, aes(label = model)) +
+  geom_point(data = potential_outliers, color = "red") +
+  geom_point(
+    data = potential_outliers,
+    color = "red", size = 3, shape = "circle open"
+  )
+
+# Custom themes
+
+ggplot(mpg, aes(x = displ, y = hwy)) +
+  geom_point(aes(color = class)) +
+  geom_smooth(se = FALSE) +
+  theme_bw()
+
+ggplot(mpg, aes(x = displ, y = hwy)) +
+  geom_point(aes(color = class)) +
+  geom_smooth(se = FALSE) +
+  theme_minimal()
+
+
+
+
