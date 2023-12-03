@@ -82,10 +82,6 @@ flights |>
   )
 
 
-### Exercises: ADD LINK and add something for recoding
-
-### Exercise solutions: ADD LINK
-
 
 ### Data visualization with ggplot2 ###
 
