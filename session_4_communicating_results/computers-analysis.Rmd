@@ -2,10 +2,10 @@
 title: "Computers analysis"
 author: "George Mount"
 output:
-  html_notebook: default
   html_document:
     df_print: paged
   pdf_document: default
+  html_notebook: default
 ---
 
 # Does the presence of a CD-ROM affect sales price?
@@ -37,7 +37,7 @@ The source of this data is the *Journal of Applied Econometrics*. It came to us 
 
 
 ```{r}
-computers <- read_excel("../../datasets/computers.xlsx")
+computers <- read_excel("datasets/computers.xlsx")
 computers
 ```
 
@@ -110,18 +110,29 @@ It looks good:
 
 ```{r}
 ggplot(data = computers, aes(x = price)) +
-  geom_histogram() +
+  geom_histogram(binwidth = 100) +
   facet_grid(~ cd)
 ```
 
 ### T-test
 
+
+```{r include = FALSE}
+
+cd_test <- t.test(price ~ cd, data = computers)
+tidy_cd_test <- tidy(cd_test)
+tidy_cd_test
+
+ci_low <- currency(tidy_cd_test['conf.low']) * -1
+ci_low
+ci_high <- currency(tidy_cd_test['conf.high']) * -1
+ci_high
+```
+
+
 The test was significant at p < .005. With 95% confidence we expect computers with a CD-ROM to sell between `r ci_low` and `r ci_high` less. 
 
-
-
 The full results are as follows: 
-
 
 
 ```{r}
@@ -129,14 +140,6 @@ cd_test <- t.test(price ~ cd, data = computers)
 tidy_cd_test <- tidy(cd_test)
 tidy_cd_test
 ```
-
-```{r include = FALSE}
-ci_low <- currency(tidy_cd_test['conf.low']) * -1
-ci_low
-ci_high <- currency(tidy_cd_test['conf.high']) * -1
-ci_high
-```
-
 
 
 
@@ -154,6 +157,6 @@ Maybe premium computers tend to have CD Roms, and *that's* what is really affect
 - [Link to original dataset](https://rdrr.io/cran/Ecdat/man/Computers.html)
 - A computer of a CD-ROM drive :) 
 
-![CD drive](../../images/cd-drive.jpg){width=50%}
+![CD drive](images/cd-drive.jpg){width=50%}
 
 <!-- Or we can use HTML!-->
