@@ -29,14 +29,3 @@ ggplot(penguins, aes(x = bill_length_mm, y = bill_depth_mm)) +
 ggplot(penguins, aes(x = bill_length_mm, y = bill_depth_mm)) +
   geom_point() +
   facet_wrap(~island)
-
-# 6. Highlighting Outliers
-outliers <- subset(penguins, bill_length_mm > 50 & bill_depth_mm < 15)
-ggplot(penguins, aes(x = bill_length_mm, y = bill_depth_mm)) +
-  geom_point() +
-  geom_point(data = outliers, color = "red")
-
-# 7. Custom Themes
-ggplot(penguins, aes(x = bill_length_mm, y = bill_depth_mm, color = species)) +
-  geom_point() +
-  theme_minimal()

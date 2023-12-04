@@ -12,8 +12,9 @@ mutated_penguins <- penguins |>
   mutate(
     medium_bill = bill_length_mm > 40 & bill_length_mm < 45,
     is_dream_island = island == 'Dream',
-    .keep = "used"
+    .keep = 'used'
   )
+
 
 # 3. Handling Missing Values in Island Column
 na_island_penguins <- penguins |>
